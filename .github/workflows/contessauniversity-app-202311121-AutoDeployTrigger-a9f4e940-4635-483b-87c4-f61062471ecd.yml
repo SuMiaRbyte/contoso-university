@@ -1,0 +1,42 @@
+name: Trigger auto deployment for contessauniversity-app-202311121
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ master ]
+    paths:
+    - '**'
+    - '.github/workflows/contessauniversity-app-202311121-AutoDeployTrigger-a9f4e940-4635-483b-87c4-f61062471ecd.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:
+      
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.CONTESSAUNIVERSITYAPP202311121_AZURE_CREDENTIALS }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: contessauniversity20231112130223.azurecr.io
+          registryUsername: ${{ secrets.CONTESSAUNIVERSITYAPP202311121_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.CONTESSAUNIVERSITYAPP202311121_REGISTRY_PASSWORD }}
+          containerAppName: contessauniversity-app-202311121
+          resourceGroup: DefaultResourceGroup-EUS
+          imageToBuild: contessauniversity20231112130223.azurecr.io/contessauniversity-app-202311121:${{ github.sha }}
+          
+
+     
+
